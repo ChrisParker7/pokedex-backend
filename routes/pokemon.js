@@ -37,15 +37,20 @@ router.get('/:name', async (req, res) => {
             return res.status(404).json({ message: 'Pokemon not found' });
         }
 
-        // No need to look up moves separately since details are stored in the document
+        // Transform the moves data to include all necessary properties
         const transformedPokemon = {
             ...pokemon.toObject(),
             moves: pokemon.moves.map(move => ({
-                move: move.move,
-                level_learned_at: move.level_learned_at,
-                current_pp: move.current_pp,
-                max_pp: move.max_pp,
-                moveDetails: move.moveDetails
+                move: move.move,  // Name of the move
+                damage_class: move.moveDetails.damage_class,
+                type: move.moveDetails.type,
+                power: move.moveDetails.power,
+                accuracy: move.moveDetails.accuracy,
+                pp: move.moveDetails.pp,
+                current_pp: move.moveDetails.pp,
+                max_pp: move.moveDetails.pp,
+                priority: move.moveDetails.priority || 0,
+                level_learned_at: move.level_learned_at
             }))
         };
 

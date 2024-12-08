@@ -1,8 +1,12 @@
+require('dotenv').config(); // Lädt Variablen aus .env
 const mongoose = require('mongoose');
 const axios = require('axios');
 const Move = require('./models/move');
 
-mongoose.connect('mongodb://localhost:27017/pokedex');
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.error('Error connecting to MongoDB:', err));
+
 
 const importMoves = async () => {
     try {
@@ -12,10 +16,10 @@ const importMoves = async () => {
 
         for (const move of moves) {
             const moveData = await axios.get(move.url);
-            const germanName = await getGermanName(moveData.data.names);
+            const germanName = getGermanName(moveData.data.names);
 
             const moveDoc = {
-                _id: germanName,  // Changed: Use German name as primary ID
+                _id: germanName,  // Use German name as primary ID
                 englishName: moveData.data.name,  // Store English name separately
                 germanName: germanName,    // German name
                 type: translateType(moveData.data.type.name),
@@ -45,7 +49,6 @@ const importMoves = async () => {
                 }
             };
 
-            // Use findOneAndUpdate with upsert instead of save
             await Move.findOneAndUpdate(
                 { _id: moveDoc._id },
                 moveDoc,

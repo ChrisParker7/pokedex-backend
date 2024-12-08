@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Pokemon = require('./models/pokemon');
 const cors = require('cors');
+require('dotenv').config();
 
 
 const app = express();
@@ -11,18 +12,14 @@ app.use(cors());
 
 
 // Verbindung zur MongoDB-Datenbank herstellen
-mongoose.connect('mongodb://localhost:27017/pokedex', {
+const MONGO_URI = process.env.MONGO_URI;
+mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {
-    console.log('Verbunden mit der MongoDB-Datenbank');
-}).catch((error) => {
-    console.error('Fehler beim Verbinden zur MongoDB:', error);
-});
-
-// Routen
-app.get('/', (req, res) => {
-    res.send('Willkommen beim Pokedex!');
+    console.log('Verbunden mit MongoDB');
+}).catch(err => {
+    console.error(err);
 });
 
 // Route, um Pokémon hinzuzufügen (Beispiel-Daten)
